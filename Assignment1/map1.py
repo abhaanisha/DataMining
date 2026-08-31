@@ -1,32 +1,16 @@
-#!/usr/bin/env python3
-"""
-Round 1 mapper -- bucketise every value.
-
-  in  : one numeric value per line
-  out : <bucket key> \t <value>
-
-The bucket key is "1" followed by a fixed-width, zero-padded bucket id
-(floor(v / BIN_WIDTH), shifted by OFFSET so negative inputs stay non-negative).
-Every key this job ever emits is a digit string of the same length, so the
-plain `sort` between mapper and reducer orders keys exactly the way a numeric
-sort would, under any locale.  Leading tag "1" is for data buckets; tag "0" is
-reserved for the global-count key that map2.py introduces, which is what makes
-the count reach reduce2.py ahead of the buckets.
-"""
 
 import math
 import sys
 
-# behave like a normal unix filter when the downstream stage stops reading (e.g. `| head`)
 try:
     import signal
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 except (ImportError, AttributeError, ValueError):
     pass
 
-BIN_WIDTH = 1.0             # values that land in the same unit interval group together
-WIDTH = 12                  # digits in the padded bucket id
-OFFSET = 10 ** 11           # shift so bucket ids are non-negative
+BIN_WIDTH = 1.0             
+WIDTH = 12                  
+OFFSET = 10 ** 11           
 
 
 def bucket_key(v):
